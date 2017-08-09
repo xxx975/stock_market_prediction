@@ -105,17 +105,32 @@ def normalize10day(stocks):
     return stocks_dat
     
 
+from glb.mst import *
 # <codecell>
 
-print "loading data.."
+print("loading data..")
 train = np.array(p.read_table('./training.csv', sep = ","))
 test = np.array(p.read_table('./test.csv', sep = ","))
+
+for cell in test[:,range(17, 48)]:
+    print(cell)
+    plt.plot(cell)
+    plt.show()
+    break
+
+print('----'* 10)
 
 ################################################################################
 # READ IN THE TEST DATA
 ################################################################################
 # all data from opening 1 to straight to opening 10
 X_test = normalize10day(test[:,range(17, 48)]) # load in test data
+
+for cell in X_test:
+    print(cell)
+    break
+
+exit()
 
 #X_test = X_test_stockdata
 
@@ -142,7 +157,7 @@ y = (y_stockdata[:,1] - y_stockdata[:,0] > 0) + 0
 
 X_test = X_test[:,[0, 3, 5, 8, 10, 13, 15, 18, 20, 23, 25, 28, 30]]
 X = X[:,[0, 3, 5, 8, 10, 13, 15, 18, 20, 23, 25, 28, 30]]
-print "this step done"
+print("this step done")
 
 # <codecell>
 
@@ -161,19 +176,19 @@ for i in range(10):
     new_Y = new_Y + list(y[indxs,:])
                                                                    
 new_X = np.hstack((np.array(pred_ridge).reshape(len(pred_ridge), 1), np.array(pred_randomforest).reshape(len(pred_randomforest), 1)))
-print new_X
+print(new_X)
 new_Y = np.array(new_Y).reshape(len(new_Y), 1)
 
 # <codecell>
 
 model_stacker = lm.LogisticRegression()
-print np.mean(cross_validation.cross_val_score(model_stacker, new_X, new_Y.reshape(new_Y.shape[0]), cv=5, scoring = auc_scorer))
+print(np.mean(cross_validation.cross_val_score(model_stacker, new_X, new_Y.reshape(new_Y.shape[0]), cv=5, scoring = auc_scorer)))
 
 # <codecell>
 
 model_stacker.fit(new_X, new_Y.reshape(new_Y.shape[0]))
 
-print "prediction"
+print("prediction")
 # do a prediction and save it
 pred_ridge_test = model_ridge.fit(X, y).predict_proba(X_test)[:,1]
 pred_randomforest_test = model_randomforest.fit(X, y).predict_proba(X_test)[:,1]
@@ -191,7 +206,7 @@ testindices = [100 * D + StId for (D, StId) in testfile.index]
 pred_df = p.DataFrame(np.vstack((testindices, pred)).transpose(), columns=["Id", "Prediction"])
 pred_df.to_csv('./predictions/' + 'stacker' + '/' + 'stacker' + ' ' + strftime("%m-%d %X") + ".csv", index = False)
 
-print "submission file created"
+print("submission file created")
 
 # <codecell>
 
